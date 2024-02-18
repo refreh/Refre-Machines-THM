@@ -1,0 +1,17 @@
+Manual Explotation:
+-Encontré la versión
+//
+Apache/2.4.29
+//
+-Busqué la vulnerabilidad
+//
+https://www.exploit-db.com/exploits/47887
+//
+-Copié el exploit en un txt
+-Ejecuté el comando
+//
+python3 exploit.py https://machine_ip
+//
+-El exploit es remote de Remote Access
+-Cuando gané acceso a la maquina hice {ls} se mostró la flag y le hice cat :3 
+FIN
