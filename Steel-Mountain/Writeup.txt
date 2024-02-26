@@ -1,9 +1,4 @@
-Hola, esté es mi Write up de la Maquina Steel Mountain 
-
-Bueno Obviamente lo primero que realicé fue un Scan
-sudo nmap sudo nmap -p- -sV -T4 -A 10.10.13.172 -vvv
 Steel Mountain Machine Write-Up
-
 Para comenzar con mi análisis de la máquina Steel Mountain, realicé un escaneo de puertos utilizando la herramienta Nmap:
 //
 sudo nmap -p- -sV -T4 -A 10.10.13.172 -vvv
